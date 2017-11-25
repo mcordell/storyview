@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/tmc/keyring"
 )
@@ -12,6 +13,8 @@ const (
 	JiraUsernameConfigKey = "jiraUsername"
 	// JiraURLConfigKey is configuration key for the JIRA site url
 	JiraURLConfigKey = "jiraURL"
+	jiraKeyRingKey   = "storyviewJiraPass"
+	circleKeyRingKey = "storyviewCirclePass"
 )
 
 // JIRAConfiguration is stores necessary data to create a JIRA client
@@ -32,7 +35,7 @@ func Circle() (c CircleConfiguration, err error) {
 		username = viper.GetString(CircleUsernameConfigKey)
 	)
 
-	circleAPIToken, err := keyring.Get("hudCircle", username)
+	circleAPIToken, err := keyring.Get(circleKeyRingKey, username)
 	if err != nil {
 		return
 	}
@@ -50,7 +53,7 @@ func JIRA() (config JIRAConfiguration, err error) {
 	config.Username = username
 	config.URL = url
 
-	jiraPassword, err := keyring.Get("storyviewJiraPass", username)
+	jiraPassword, err := keyring.Get(jiraKeyRingKey, username)
 
 	if err != nil {
 		return
@@ -59,4 +62,30 @@ func JIRA() (config JIRAConfiguration, err error) {
 	config.Password = jiraPassword
 
 	return
+}
+
+// StoreJIRACredentials stores a password for the given user name
+func StoreJIRACredentials(username string, password string) error {
+	if username == "" {
+		username = viper.GetString(JiraUsernameConfigKey)
+	}
+
+	if username == "" {
+		return errors.New("JIRA username cannot be blank")
+	}
+
+	return keyring.Set(jiraKeyRingKey, username, password)
+}
+
+// StoreCircleCredentials stores a password for the given user name
+func StoreCircleCredentials(username string, password string) error {
+	if username == "" {
+		username = viper.GetString(CircleUsernameConfigKey)
+	}
+
+	if username == "" {
+		return errors.New("Circle username cannot be blank")
+	}
+
+	return keyring.Set(circleKeyRingKey, username, password)
 }
