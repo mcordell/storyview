@@ -31,8 +31,11 @@ func Display(info StoryInformation, displayer Displayer) {
 type Plain struct {
 }
 
+const plainSpacer = "  "
+
 func (p Plain) issue(issue jira.Issue) {
 	fmt.Printf("Issue %s: %s\n", issue.Issue.Key, issue.Issue.Fields.Summary)
+	fmt.Printf("%s%s\n", plainSpacer, issue.BrowseURL)
 }
 
 func (p Plain) branches(branches []*jira.Branch) {
@@ -40,12 +43,10 @@ func (p Plain) branches(branches []*jira.Branch) {
 		return
 	}
 
-	spacer := "  "
-
-	fmt.Printf("%sBranches:\n", spacer)
+	fmt.Printf("%sBranches:\n", plainSpacer)
 
 	for _, branch := range branches {
-		fmt.Printf("%s%s%s\n", spacer, spacer, branch.Name)
+		fmt.Printf("%s%s%s\n", plainSpacer, plainSpacer, branch.Name)
 	}
 }
 
@@ -55,14 +56,12 @@ func (p Plain) pullRequests(pnbs PRsAndBuilds) {
 		return
 	}
 
-	spacer := "  "
-
-	fmt.Printf("%sPull Requests:\n", spacer)
+	fmt.Printf("%sPull Requests:\n", plainSpacer)
 
 	for pullRequest, builds := range pnbs {
-		fmt.Printf("%s%s%s\n", spacer, spacer, pullRequest.OneLine())
+		fmt.Printf("%s%s%s\n", plainSpacer, plainSpacer, pullRequest.OneLine())
 		for _, build := range builds {
-			fmt.Printf("%s%s%s%s\n", spacer, spacer, spacer, p.circleBuild(build))
+			fmt.Printf("%s%s%s%s\n", plainSpacer, plainSpacer, plainSpacer, p.circleBuild(build))
 		}
 	}
 }

@@ -34,6 +34,7 @@ var fetchCmd = &cobra.Command{
 		}
 
 		issue, err := jira.GetIssue(client, args[0])
+		issue.SetBrowseURL(client)
 
 		if err != nil {
 			panic(err)

@@ -13,7 +13,15 @@ import (
 )
 
 type Issue struct {
-	Issue *jira.Issue
+	Issue     *jira.Issue
+	BrowseURL string
+}
+
+//
+func (i *Issue) SetBrowseURL(client *jira.Client) {
+	u := client.GetBaseURL()
+	u.Path = fmt.Sprintf("browse/%s", i.Issue.Key)
+	i.BrowseURL = u.String()
 }
 
 // NewJIRAClient creates a new JIRA client
