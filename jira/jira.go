@@ -12,6 +12,10 @@ import (
 	"strings"
 )
 
+type Issue struct {
+	Issue *jira.Issue
+}
+
 // NewJIRAClient creates a new JIRA client
 func NewJIRAClient(creds *config.JIRAConfiguration) (c *jira.Client, err error) {
 	c, err = jira.NewClient(nil, creds.URL)
@@ -25,9 +29,9 @@ func NewJIRAClient(creds *config.JIRAConfiguration) (c *jira.Client, err error) 
 }
 
 // GetIssue return a JIRA issue from by JIRA ID
-func GetIssue(client *jira.Client, id string) (*jira.Issue, error) {
+func GetIssue(client *jira.Client, id string) (Issue, error) {
 	issue, _, err := client.Issue.Get(id, nil)
-	return issue, err
+	return Issue{Issue: issue}, err
 }
 
 // PrintIssue ...
