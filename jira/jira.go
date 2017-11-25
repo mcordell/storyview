@@ -5,6 +5,7 @@ import (
 	"fmt"
 	jira "github.com/andygrunwald/go-jira"
 	"github.com/mcordell/storyview/config"
+	"github.com/mcordell/storyview/github"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"regexp"
@@ -119,22 +120,17 @@ type PullRequest struct {
 	Source       *Branch     `json:"source"`
 }
 
-// OneLineable is an interface for a structure that can be converted to a one line string
-type OneLineable interface {
-	OneLine() string
-}
-
 // OneLine returns a pull a request as a single string line
 func (p *PullRequest) OneLine() string {
 	return fmt.Sprintf("%s %s", p.Status, p.URL)
 }
 
 // SourceBranch returns the information for the source branch of a Pull Request
-func (p *PullRequest) SourceBranch() GithubBranch {
+func (p *PullRequest) SourceBranch() github.Branch {
 	re := regexp.MustCompile("github.com/([^/]*)/([^/]*)/tree/([^/]*)")
 	matches := re.FindAllSubmatch([]byte(p.Source.URL), -1)
 	if len(matches) == 0 {
-		return GithubBranch{}
+		return github.Branch{}
 	}
 
 	var (
@@ -143,16 +139,9 @@ func (p *PullRequest) SourceBranch() GithubBranch {
 		branch  = string(matches[0][3])
 	)
 
-	return GithubBranch{
+	return github.Branch{
 		Account: account,
 		Repo:    repo,
 		Branch:  branch,
 	}
-}
-
-// GithubBranch stores basic data about a git branch on github.
-type GithubBranch struct {
-	Account string
-	Repo    string
-	Branch  string
 }

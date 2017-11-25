@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jszwedko/go-circleci"
 	"github.com/mcordell/storyview/config"
-	"github.com/mcordell/storyview/jira"
+	"github.com/mcordell/storyview/github"
 	"github.com/pkg/errors"
 )
 
@@ -19,7 +19,7 @@ func OneLineBuild(b *circleci.Build) string {
 }
 
 // GetBuilds gets the current builds from circle for a given branch
-func GetBuilds(client *circleci.Client, b jira.GithubBranch) (builds []*circleci.Build, err error) {
+func GetBuilds(client *circleci.Client, b github.Branch) (builds []*circleci.Build, err error) {
 	if b.Account == "" {
 		err = errors.New("Cannot get builds for empty branch")
 		return
