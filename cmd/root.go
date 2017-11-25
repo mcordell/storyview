@@ -9,6 +9,7 @@ import (
 )
 
 var cfgFile string
+var verbosity bool
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -30,6 +31,8 @@ func Execute() {
 }
 
 func init() {
+	RootCmd.PersistentFlags().BoolVarP(&verbosity, "verbose", "v", false, "turn on verbose messages")
+
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -61,6 +64,8 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		if verbosity {
+			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		}
 	}
 }
