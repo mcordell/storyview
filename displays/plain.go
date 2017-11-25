@@ -2,32 +2,40 @@ package displays
 
 import (
 	"fmt"
-	"github.com/mcordell/storyview/circle"
-	"github.com/mcordell/storyview/config"
+	"github.com/jszwedko/go-circleci"
 	"github.com/mcordell/storyview/jira"
 )
 
+type StoryInformation struct {
+	Issue        jira.Issue
+	Branches     []*jira.Branch
+	PRsAndBuilds PRsAndBuilds
+}
+
+type PRsAndBuilds map[*jira.PullRequest][]*circleci.Build
+
 type Displayer interface {
-	Branches(branches []*jira.Branch)
-	PullRequests(pullRequests []*jira.PullRequest, circleCredentials *config.CircleConfiguration)
-	Issue(issue jira.Issue)
+	issue(jira.Issue)
+	branches([]*jira.Branch)
+	pullRequests(PRsAndBuilds)
 }
 
 // Display ...
-func Display(i jira.Issue, branches []*jira.Branch, prs []*jira.PullRequest, c *config.CircleConfiguration, d Displayer) {
-	d.Issue(i)
-	d.Branches(branches)
-	d.PullRequests(prs, c)
+func Display(info StoryInformation, displayer Displayer) {
+	displayer.issue(info.Issue)
+	displayer.branches(info.Branches)
+	displayer.pullRequests(info.PRsAndBuilds)
 }
 
+// Plain is a plain text displayer
 type Plain struct {
 }
 
-func (p Plain) Issue(issue jira.Issue) {
+func (p Plain) issue(issue jira.Issue) {
 	fmt.Printf("Issue %s: %s\n", issue.Issue.Key, issue.Issue.Fields.Summary)
 }
 
-func (p Plain) Branches(branches []*jira.Branch) {
+func (p Plain) branches(branches []*jira.Branch) {
 	if len(branches) == 0 {
 		return
 	}
@@ -41,8 +49,9 @@ func (p Plain) Branches(branches []*jira.Branch) {
 	}
 }
 
-func (p Plain) PullRequests(pullRequests []*jira.PullRequest, circleCredentials *config.CircleConfiguration) {
-	if len(pullRequests) == 0 {
+func (p Plain) pullRequests(pnbs PRsAndBuilds) {
+	if len(pnbs) == 0 {
+		fmt.Println("PNBs are empty")
 		return
 	}
 
@@ -50,14 +59,18 @@ func (p Plain) PullRequests(pullRequests []*jira.PullRequest, circleCredentials 
 
 	fmt.Printf("%sPull Requests:\n", spacer)
 
-	for _, pullRequest := range pullRequests {
+	for pullRequest, builds := range pnbs {
 		fmt.Printf("%s%s%s\n", spacer, spacer, pullRequest.OneLine())
-		circleClient := circle.BuildClient(circleCredentials)
-		builds, err := circle.GetBuilds(circleClient, pullRequest.SourceBranch())
-		if err == nil {
-			for _, build := range builds {
-				fmt.Printf("%s%s%s%s\n", spacer, spacer, spacer, circle.OneLineBuild(build))
-			}
+		for _, build := range builds {
+			fmt.Printf("%s%s%s%s\n", spacer, spacer, spacer, p.circleBuild(build))
 		}
 	}
+}
+
+func (p Plain) circleBuild(b *circleci.Build) string {
+	return fmt.Sprintf("Num: %d, Status: %s, Outcome: %s | %s", b.BuildNum, b.Status, b.Outcome, b.BuildURL)
+}
+
+func (p Plain) pullRequest(pr jira.PullRequest) string {
+	return fmt.Sprintf("%s %s", pr.Status, pr.URL)
 }

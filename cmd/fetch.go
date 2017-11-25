@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+	"github.com/mcordell/storyview/circle"
 	"github.com/mcordell/storyview/config"
 	"github.com/mcordell/storyview/displays"
 	"github.com/mcordell/storyview/jira"
@@ -48,8 +50,23 @@ var fetchCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		formatter := displays.Plain{}
-		displays.Display(issue, result.Branches, result.PullRequests, &circleConfig, formatter)
+
+		pnbs := make(displays.PRsAndBuilds)
+
+		circleClient := circle.BuildClient(&circleConfig)
+
+		for _, pr := range result.PullRequests {
+			builds, err := circle.GetBuilds(circleClient, pr.SourceBranch())
+			pnbs[pr] = builds
+			if err != nil && verbosity {
+				fmt.Printf("Error during build fetching %s", err.Error())
+			}
+		}
+
+		displays.Display(
+			displays.StoryInformation{Issue: issue, Branches: result.Branches, PRsAndBuilds: pnbs},
+			displays.Plain{},
+		)
 	},
 }
 
