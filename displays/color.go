@@ -2,9 +2,11 @@ package displays
 
 import (
 	"fmt"
+	"github.com/bbrks/wrap"
 	"github.com/fatih/color"
 	"github.com/jszwedko/go-circleci"
 	"github.com/mcordell/storyview/jira"
+	"strings"
 )
 
 type Color struct {
@@ -12,7 +14,10 @@ type Color struct {
 
 func (c Color) issue(issue jira.Issue) {
 	fmt.Printf("%s [%s] %s: %s\n", ColorizedType(issue.Issue.Fields.Type.Name), ColorizedStatus(issue.Issue.Fields.Status.Name), issue.Issue.Key, issue.Issue.Fields.Summary)
-	fmt.Printf("%s%s\n", plainSpacer, issue.BrowseURL)
+	fmt.Printf("%s%s\n\n", plainSpacer, issue.BrowseURL)
+	for _, value := range strings.Split(wrap.Wrap(issue.Issue.Fields.Description, 80), "\n") {
+		fmt.Printf("%s%s\n", plainSpacer, value)
+	}
 }
 
 func (c Color) branches(branches []*jira.Branch) {
@@ -74,6 +79,7 @@ var colorMap = map[string]*color.Color{
 	"MERGED":      greenText,
 	"CLOSED":      redText,
 	"canceled":    redText,
+	"failed":      redText,
 	"OPEN":        yellowText,
 	"In Progress": yellowText,
 	"running":     yellowText,
