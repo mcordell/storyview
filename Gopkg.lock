@@ -8,6 +8,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/bbrks/wrap"
+  packages = ["."]
+  revision = "e60be0e25cebe43945acf3541683f59e3029c24c"
+  version = "v2.3.0"
+
+[[projects]]
   name = "github.com/fatih/color"
   packages = ["."]
   revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
@@ -166,6 +172,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "941d912fd451e3bce80ba48de715292aad5a530ea07ac4abaaff7ced9a320e41"
+  inputs-digest = "8ff8af48b7f6acfba71747218781645d06f7d749f352cb82684047b2f7e94515"
   solver-name = "gps-cdcl"
   solver-version = 1
