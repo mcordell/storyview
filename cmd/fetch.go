@@ -64,11 +64,18 @@ var fetchCmd = &cobra.Command{
 			}
 		}
 
+		fmt.Println("")
+
 		displays.Display(
 			displays.StoryInformation{Issue: issue, Branches: result.Branches, PRsAndBuilds: pnbs},
-			displays.Plain{},
+			GetDisplayer(),
 		)
 	},
+}
+
+// GetDisplayer
+func GetDisplayer() displays.Displayer {
+	return displays.Color{}
 }
 
 func init() {

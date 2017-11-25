@@ -12,12 +12,13 @@ import (
 	"strings"
 )
 
+// Issue wraps go-jira issue
 type Issue struct {
 	Issue     *jira.Issue
 	BrowseURL string
 }
 
-//
+// SetBrowseURL sets the url for opening the JIRA issue
 func (i *Issue) SetBrowseURL(client *jira.Client) {
 	u := client.GetBaseURL()
 	u.Path = fmt.Sprintf("browse/%s", i.Issue.Key)
