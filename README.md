@@ -42,7 +42,7 @@ storyview login
 
 The command will prompt you for your credentials, type `q` when done.
 
-### Usage
+## Usage
 
 You can fetch the details of a story with one command `fetch`, just provide the
 JIRA key after it as an argument.
@@ -55,6 +55,17 @@ This will provide you with the following information:
 
 ![Annotated image][example-image-annotated]
 
+*Protip* If using iTerm2, you can Cmd+Click on them to open them in browser
+
+## Development
+
+1. Install go
+2. Install [dep][dep]
+3. `git clone git@github.com:mcordell/storyview.git`
+4. `dep ensure`
+
+
+[dep]: https://github.com/golang/dep#setup
 [example-image]: https://github.com/mcordell/storyview/raw/master/images/example.png
 [example-image-annotated]: https://github.com/mcordell/storyview/raw/master/images/example-annotated.png
 [circle-token-ref]: https://circleci.com/docs/api/v1-reference/#authentication
