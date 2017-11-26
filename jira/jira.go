@@ -8,6 +8,7 @@ import (
 	"github.com/mcordell/storyview/github"
 	"github.com/pkg/errors"
 	"io/ioutil"
+	"net/http"
 	"regexp"
 	"strings"
 )
@@ -39,7 +40,11 @@ func NewJIRAClient(creds *config.JIRAConfiguration) (c *jira.Client, err error) 
 
 // GetIssue return a JIRA issue from by JIRA ID
 func GetIssue(client *jira.Client, id string) (Issue, error) {
-	issue, _, err := client.Issue.Get(id, nil)
+	issue, response, err := client.Issue.Get(id, nil)
+	if response.StatusCode == http.StatusNotFound {
+		err = errors.Errorf("Could not find issue with id %s", id)
+	}
+
 	return Issue{Issue: issue}, err
 }
 
